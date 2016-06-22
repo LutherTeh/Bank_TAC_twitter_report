@@ -1,0 +1,48 @@
+---
+title: "Twitter daily report on BANK TAC complaint"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document:
+    theme : united
+    highlight: tango
+
+---
+```{r setup, include=FALSE}
+# Load packages and initialize data here
+require(knitr)
+require(XML)
+require(ggplot2)
+require(plotly)
+require(DT)
+```
+
+
+```{r, echo=FALSE,include=FALSE, message=FALSE,warnings = FALSE}
+source("C:/Users/km.teh/Desktop/BDA/mbbtac_tweet.R")
+mbb<-mbbtac_tweet(200)
+
+source("C:/Users/km.teh/Desktop/BDA/cimbtac_tweet.R")
+cimb<-cimbtac_tweet(200)
+
+```
+
+### Maybank TAC complaint versus time
+
+```{r, echo=FALSE}
+source("C:/Users/km.teh/Desktop/BDA/plot_datetweet.R")
+plot_datetweet(mbb)
+datatable(mbb[,c("text","screenName","createdMsia)])
+```
+
+
+### CIMB TAC complaint versus time
+
+```{r, echo=FALSE}
+source("C:/Users/km.teh/Desktop/BDA/plot_datetweet.R")
+plot_datetweet(cimb)
+datatable(cimb[,c("text","screenName","createdMsia)])
+
+```
+
+
+
