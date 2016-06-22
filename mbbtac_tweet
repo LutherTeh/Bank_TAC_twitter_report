@@ -1,0 +1,52 @@
+## function to call twitter API, mine on maybank TAC complaint related tweet, return the df for plotting next
+
+mbbtac_tweet <-function(number)
+
+{
+
+library(dplyr)
+library(RCurl)
+library(devtools)
+library(twitteR)
+library(httr)
+
+require("ggplot2")
+library(tm)
+options(httr_oauth_cache=T)
+
+#twitter API authenthication
+consumer_key <- '##your consumer key'
+consumer_secret <- '##your consumer secret'
+access_token <- '##your access token'
+access_token_secret <- '##your access token'
+setup_twitter_oauth(consumer_key,consumer_secret,access_token,access_token_secret)
+
+# twitter mining on public tweet regard to bank tac (suggested keyword)
+mbb2 <- searchTwitter("MyMaybank | maybank2u | 'maybank tac' | #maybank2u | #maybanktac", number)
+
+# twlisttoDF - convert tweet list to dataframe consist of text,time, ID...
+mbb2 <-twListToDF(mbb2)
+
+# row bind two dataframe into one
+mbb_all <- rbind(mbb,mbb2)
+
+#add 8 hours to twitter created time to become msia local time
+mbb_all$createdMsia <- mbb_all$created + (8*3600)
+
+# sorting according to createdMsia (local time) in decreasing order (latest will be on top)
+mbb_all <- mbb_all[order(mbb_all$createdMsia,decreasing=TRUE),]
+
+#filter those row which contain " tac| TAC" string
+#using dplyr-filter function , not stats-filter
+mbb_all <-filter(mbb_all, grepl('tac| TAC', text))
+
+
+# output file name = current date + mbb
+filename <- paste(Sys.Date(), "mbb.csv")
+
+#output as csv
+write.csv(mbb_all, file=filename,row.names = FALSE )
+
+return(mbb_all)
+
+}
